@@ -1,16 +1,16 @@
 /* 
 @file
 BLM3021 2020-2021 GUZ ODEV-3 / Soru-2
-Bu programda sorgulanan bir cümlede, yanlış yazılmış kelimelerin yerine doğru kelimeler öneren bir sistem tasarımı gerçeklenmiştir
+Bu programda sorgulanan bir cÃ¼mlede, yanlÄ±ÅŸ yazÄ±lmÄ±ÅŸ kelimelerin yerine doÄŸru kelimeler Ã¶neren bir sistem tasarÄ±mÄ± gerÃ§eklenmiÅŸtir
 
 @author
-İsim: Ahmet Said SAĞLAM
-Öğrenci No: 17011501
+Ä°sim: Ahmet Said SAÄLAM
+Ã–ÄŸrenci No: 17011501
 Tarih: 19.12.2020
 E-Mail: l1117501@std.yildiz.edu.tr
 Compiler: TDM-GCC 4.9.2 64 bit-Release
 IDE: DEV-C++ (version 5.11)
-İşletim Sistemi: Windows 10 Pro 64 bit
+Ä°ÅŸletim Sistemi: Windows 10 Pro 64 bit
 */
 
 #include <stdio.h>
@@ -20,16 +20,16 @@ IDE: DEV-C++ (version 5.11)
 #include <stdbool.h>
 #include <ctype.h>
 
-#define SENTENCE_SIZE 200	//kullanıcıdan alınacak olan maksimum cümle uzunlugu
-#define BUFFER_SIZE 10000 //txt dosyadan alınan satırın saklanacağı bufferin boyutu
+#define SENTENCE_SIZE 200	//kullanÄ±cÄ±dan alÄ±nacak olan maksimum cÃ¼mle uzunlugu
+#define BUFFER_SIZE 10000 //txt dosyadan alÄ±nan satÄ±rÄ±n saklanacaÄŸÄ± bufferin boyutu
 #define TEXT_NAME_SIZE 20 // max file ismi uzunlugu
 #define AYRAC " "	//kelimelerin ayrilacagi delim ifadesi
 #define HORNER_NUMBER 7	//horner numarasi hesaplanirken kullanilcak olan asal sayi
 #define WORD_SIZE 20	//alinan bir kelimenin maksimum uzunlugu
 #define MM 996 //double hashing hesabinda, iki numarali keyi hesaplarken kullanilacak olan sayi
 #define M 997 //hash tablosunun boyutu
-#define SOZLUK_TXT "sozluk.txt"	//sozlugu tutan hash tablosunun kaydedildigi dosyanin ismi
-#define HATALI_TXT "hatalikelime.txt"	//hatali kelime sozlugunu tutan hash tablosunun kaydedildigi dosyanin ismi
+// #define SOZLUK_TXT "sozluk.txt"	//sozlugu tutan hash tablosunun kaydedildigi dosyanin ismi
+// #define HATALI_TXT "hatalikelime.txt"	//hatali kelime sozlugunu tutan hash tablosunun kaydedildigi dosyanin ismi
 #define K 2 //Maksimum olabilecek Edit Distance
 
 //sozlukte tutulacak kelimeler icin structure
@@ -41,13 +41,13 @@ typedef struct node {
 
 //hatali kelime sozlugunde tutulacak olan elemanlar icin structure
 typedef struct node_2 {
-	int count;	//goz bos ise 0, dolu ise 1 degerini alır
+	int count;	//goz bos ise 0, dolu ise 1 degerini alÄ±r
 	float loadFactor;	//tablonun doluluk orani
-	char word[WORD_SIZE];	//tutulan hatalı kelime
-	char onerilen_kelime[WORD_SIZE]; //önerilen kelime
+	char word[WORD_SIZE];	//tutulan hatalÄ± kelime
+	char onerilen_kelime[WORD_SIZE]; //Ã¶nerilen kelime
 } node_2;
 
-//gets() fonksiyonu kullanılmadan önce eger scanf kullanıldıysa gets() duzgun calismayacagi icin input buffer'i temizlemmek icin gerekli fonksiyon
+//gets() fonksiyonu kullanÄ±lmadan Ã¶nce eger scanf kullanÄ±ldÄ±ysa gets() duzgun calismayacagi icin input buffer'i temizlemmek icin gerekli fonksiyon
 int clear_input_buffer(void) {
     int ch;
     while (((ch = getchar()) != EOF) && (ch != '\n'));
@@ -56,7 +56,7 @@ int clear_input_buffer(void) {
 
 //icine verilen kelimenin horner sayisini donduren fonksiyon
 long long getHorner(char *word) {
-	long long key = 0L; //kelimenin sayisal key karşılığını tutacak olan degisken
+	long long key = 0L; //kelimenin sayisal key karÅŸÄ±lÄ±ÄŸÄ±nÄ± tutacak olan degisken
 	int i; //dongu degiskeni
 	//kelimenin horner sayisi hesaplanir
 	for(i = 0; i < strlen(word); i++) {
@@ -66,7 +66,7 @@ long long getHorner(char *word) {
 	
 }
 
-//icine verilen sayilardan kucuk olanı donduren fonksiyon
+//icine verilen sayilardan kucuk olanÄ± donduren fonksiyon
 int min(int x, int y) {
 	if(x < y) {
 		return x;
@@ -74,12 +74,12 @@ int min(int x, int y) {
 	return y;
 }
 
-//icine aldıgı 3 sayıdan en kucugunu donduren fonksiyon
+//icine aldÄ±gÄ± 3 sayÄ±dan en kucugunu donduren fonksiyon
 int min_3(int x, int y, int z) {
 	return min(min(x,y), z);
 }
 
-//icine aldıgı iki karakter farklıysa 1, aynıysa 0 donduren fonksiyon
+//icine aldÄ±gÄ± iki karakter farklÄ±ysa 1, aynÄ±ysa 0 donduren fonksiyon
 int diff(char x, char y) {
 	if(x == y) {
 		return 0;
@@ -87,23 +87,23 @@ int diff(char x, char y) {
 	return 1;
 }
 
-//icerisine aldıgı iki kelimenin L.Edit Distance'nı hesaplayan fonksiyon
+//icerisine aldÄ±gÄ± iki kelimenin L.Edit Distance'nÄ± hesaplayan fonksiyon
 int calculateDistance(char *word_1, char *word_2, int w1_length, int w2_length) {
-	//Edit Distance Kesin Olarak 2'den büyükse(kelimelerin uzunlukları farkı 2'den büyükse kesin olarak 2'den büyüktür) hesaplama yapmadan fonksiyondan çıkılır.
+	//Edit Distance Kesin Olarak 2'den bÃ¼yÃ¼kse(kelimelerin uzunluklarÄ± farkÄ± 2'den bÃ¼yÃ¼kse kesin olarak 2'den bÃ¼yÃ¼ktÃ¼r) hesaplama yapmadan fonksiyondan Ã§Ä±kÄ±lÄ±r.
 	if(w1_length - w2_length > K || w2_length - w1_length > K) {
-		return 99;	//distance olarak 99 dondurulur. Anlamsız ve kullanılmayacak bir degerdir
+		return 99;	//distance olarak 99 dondurulur. AnlamsÄ±z ve kullanÄ±lmayacak bir degerdir
 	}
-	int ED[w1_length + 1][w2_length + 1]; //Edit Distance hesabında kullanılan matris olusturulur
+	int ED[w1_length + 1][w2_length + 1]; //Edit Distance hesabÄ±nda kullanÄ±lan matris olusturulur
 	int i, j; //dongu degiskenleri
-	int control = 0;	//ED kesin olarak 2'den buyuk mu diye kontrolun yapılacagı degisken	
+	int control = 0;	//ED kesin olarak 2'den buyuk mu diye kontrolun yapÄ±lacagÄ± degisken	
 
 	i = 0;	//i ilklendirilir
-	//i satır sayısı kadar donsun ve control sutun sayisindan kucuk ise donsun
+	//i satÄ±r sayÄ±sÄ± kadar donsun ve control sutun sayisindan kucuk ise donsun
 	while(i <= w1_length && control <= w2_length) {
-		control = 0;	//her satir icin control 0'lanır
-		//satırda sutun sayısı kadar dön matrisin gözlerine eris
+		control = 0;	//her satir icin control 0'lanÄ±r
+		//satÄ±rda sutun sayÄ±sÄ± kadar dÃ¶n matrisin gÃ¶zlerine eris
 		for(j = 0; j <= w2_length; j++) {
-			//matrisin 0. satırını ilklendir
+			//matrisin 0. satÄ±rÄ±nÄ± ilklendir
 			if(i == 0) {
 				ED[i][j] = j;
 			}
@@ -111,105 +111,105 @@ int calculateDistance(char *word_1, char *word_2, int w1_length, int w2_length) 
 			else if(j == 0) {
 				ED[i][j] = i;
 			}
-			//kelimelerin ilgili harfinde insert-delete-replace işlemlerinden en az mesafe hangisi ise o seçilir ve matris doldurulur.
+			//kelimelerin ilgili harfinde insert-delete-replace iÅŸlemlerinden en az mesafe hangisi ise o seÃ§ilir ve matris doldurulur.
 			else {
 				ED[i][j] = min_3((ED[i-1][j] + 1), (ED[i][j-1] + 1), (ED[i-1][j-1] + diff(word_1[i-1],word_2[j-1])));
 			}
-			//matrisin ilgili satirindaki ilgili gözün değeri 2'den büyükse control degiskenini 1 arttır
+			//matrisin ilgili satirindaki ilgili gÃ¶zÃ¼n deÄŸeri 2'den bÃ¼yÃ¼kse control degiskenini 1 arttÄ±r
 			if(ED[i][j] > K) {
 				control++;
 			}
 			//printf("kontrol - control : %d------satir : %d -- sutun : %d\n",control,i,j);
 		}
-		i++;	//yeni satıra gecmek icin i'yi guncelle
+		i++;	//yeni satÄ±ra gecmek icin i'yi guncelle
 	}
 	
-	//while dongusunden matrisin sonuna gelindigi icin cıkıldıysa, Edit Distance degeri disari dondurulur
+	//while dongusunden matrisin sonuna gelindigi icin cÄ±kÄ±ldÄ±ysa, Edit Distance degeri disari dondurulur
 	if(control <= w2_length) {
-		return ED[w1_length][w2_length];	//Edit Distance dışarı dondurulur
+		return ED[w1_length][w2_length];	//Edit Distance dÄ±ÅŸarÄ± dondurulur
 	}
-	//while dongusunden, control sutun sayısına esit oldugu icin cikildiysa, matrisin o satırındaki tum degerler 2'den buyuk demektir
-	//bir alt satıra inecek olan tum degerler 2'den buyuk olacagı icin Edit Distance'ın 2'den buyuk olacağı kesinlesmistir. 
+	//while dongusunden, control sutun sayÄ±sÄ±na esit oldugu icin cikildiysa, matrisin o satÄ±rÄ±ndaki tum degerler 2'den buyuk demektir
+	//bir alt satÄ±ra inecek olan tum degerler 2'den buyuk olacagÄ± icin Edit Distance'Ä±n 2'den buyuk olacaÄŸÄ± kesinlesmistir. 
 	else {
-		return 99; //distance olarak 99 dondurulur. Anlamsız ve kullanılmayacak bir degerdir
+		return 99; //distance olarak 99 dondurulur. AnlamsÄ±z ve kullanÄ±lmayacak bir degerdir
 	}
 }
 
-//içerisine aldığı kelime ile sözlükteki kelimelerin mesafelerini hesaplar ve dizide kaydeder. Diziyi dışarı döndürür.
+//iÃ§erisine aldÄ±ÄŸÄ± kelime ile sÃ¶zlÃ¼kteki kelimelerin mesafelerini hesaplar ve dizide kaydeder. Diziyi dÄ±ÅŸarÄ± dÃ¶ndÃ¼rÃ¼r.
 int *totalDistances(char *word, struct node *sozluk) {
-	int *distances = (int*) malloc(M * sizeof(int));	//sözlükteki kelimelerin, fonksiyonun içine aldığı kelimeye göre ED'sini tutan dizi
+	int *distances = (int*) malloc(M * sizeof(int));	//sÃ¶zlÃ¼kteki kelimelerin, fonksiyonun iÃ§ine aldÄ±ÄŸÄ± kelimeye gÃ¶re ED'sini tutan dizi
 	int i;	//dongu degiskeni
 	for (i = 0; i < M; i++) {
-		//hash tablosunda(sozlukte) ilgili göz boş ise
+		//hash tablosunda(sozlukte) ilgili gÃ¶z boÅŸ ise
 		if(sozluk[i].count == 0) {
-			distances[i] = 99;	//distance olarak 99 atanır. Anlamsız bir değerdir.
+			distances[i] = 99;	//distance olarak 99 atanÄ±r. AnlamsÄ±z bir deÄŸerdir.
 		}
 		else {
-			distances[i] = calculateDistance(word, sozluk[i].word, strlen(word), strlen(sozluk[i].word)); //ilgili ED hesaplanır
+			distances[i] = calculateDistance(word, sozluk[i].word, strlen(word), strlen(sozluk[i].word)); //ilgili ED hesaplanÄ±r
 		}
 	}
-	return distances;//dizi dışarı döndürülür
+	return distances;//dizi dÄ±ÅŸarÄ± dÃ¶ndÃ¼rÃ¼lÃ¼r
 }
 
-//cumleyi kullanıcıdan alarak gerektiginde oneri yapan ve cumlenin son halini ekrana yazdıran fonksiyon
+//cumleyi kullanÄ±cÄ±dan alarak gerektiginde oneri yapan ve cumlenin son halini ekrana yazdÄ±ran fonksiyon
 void levenshtein(struct node *sozluk, struct node_2 *hatali_sozluk, int *hatali_count) {
 	int count = 0;	//cumlede kac adet kelime var tutan degisken
-	int oneri_count = 0;	//onerilebilecek kelime sayısı
-	char *sentence = (char*) calloc(SENTENCE_SIZE, sizeof(char));	//cumle için yer açılır
+	int oneri_count = 0;	//onerilebilecek kelime sayÄ±sÄ±
+	char *sentence = (char*) calloc(SENTENCE_SIZE, sizeof(char));	//cumle iÃ§in yer aÃ§Ä±lÄ±r
 	char **words = (char**) calloc(1, sizeof(char*));	//cumleden parcalanan kelimeleri tutmak icin matris
-	words[count] = (char*) calloc(WORD_SIZE, sizeof(char));	//matrisin her satırında kelime tutmak için yer açılır
+	words[count] = (char*) calloc(WORD_SIZE, sizeof(char));	//matrisin her satÄ±rÄ±nda kelime tutmak iÃ§in yer aÃ§Ä±lÄ±r
 	char **oneriler = (char**) calloc(1, sizeof(char*)); //ED'si 1 veya 2 olan onerilecek kelimeleri tutmak icin matris
-	oneriler[oneri_count] = (char*) calloc(WORD_SIZE, sizeof(char));	//matrisin her satırında kelime tutmak için yer açılır
-	char *kullanici_onerisi = (char*) calloc(WORD_SIZE, sizeof(char));	//kullanıcı önerilen kelimeler arasından seçim yapar. Bu seçimi tutan dizi için yer açılır
+	oneriler[oneri_count] = (char*) calloc(WORD_SIZE, sizeof(char));	//matrisin her satÄ±rÄ±nda kelime tutmak iÃ§in yer aÃ§Ä±lÄ±r
+	char *kullanici_onerisi = (char*) calloc(WORD_SIZE, sizeof(char));	//kullanÄ±cÄ± Ã¶nerilen kelimeler arasÄ±ndan seÃ§im yapar. Bu seÃ§imi tutan dizi iÃ§in yer aÃ§Ä±lÄ±r
 	int cont = 1; //yeni cumle girisini kontrol eden degisken
 	int isExist; //kelime sozluk icin tanimlanan hash table'da var mi yok mu donus degerini tutan degisken(kelime tabloda mevcutsa 1, degilse 0)
 	int isExist_2; //kelime hatali kelime sozlgu icin tanimlanan hash table'da var mi yok mu donus degerini tutan degisken(kelime tabloda mevcutsa adresi, yoksa 1000)
 	int j,i;	//dongu degiskenleri
-	int *distances;	//Edit distance'ları tutan dizi için tanımlama
+	int *distances;	//Edit distance'larÄ± tutan dizi iÃ§in tanÄ±mlama
 	char *token;	//strtok ile alinan kelime
 	
-	//kullanıcı istedikçe dönen while
+	//kullanÄ±cÄ± istedikÃ§e dÃ¶nen while
 	while(cont) {
-		count = 0;	//her yeni cümlede yeni aramalar icin count değerleri 0'lanır
-		oneri_count = 0;	//her yeni cümlede yeni aramalar icin count değerleri 0'lanır
+		count = 0;	//her yeni cÃ¼mlede yeni aramalar icin count deÄŸerleri 0'lanÄ±r
+		oneri_count = 0;	//her yeni cÃ¼mlede yeni aramalar icin count deÄŸerleri 0'lanÄ±r
 		printf("Cumleyi giriniz...\n");
-		gets(sentence);	//cümle kullanıcıdan alınır
+		gets(sentence);	//cÃ¼mle kullanÄ±cÄ±dan alÄ±nÄ±r
 		sentence[strlen(sentence)] = '\0'; //cumle sinirini belirle
 				
 		token = strtok(sentence, AYRAC); //cumledeki ilk kelime alinir
-		//cumledeki kelimeler boşluk karakterine gore (" ") parçalanır
+		//cumledeki kelimeler boÅŸluk karakterine gore (" ") parÃ§alanÄ±r
 		while(token != NULL) {
 			strcpy(words[count], token);
-			//oneri_count = 0;	//yeni kelime icin oneri count değeri 0'lanır
+			//oneri_count = 0;	//yeni kelime icin oneri count deÄŸeri 0'lanÄ±r
 			words[count][strlen(words[count])] = '\0'; //kelime sinirini belirle
 			
 			//case insensitive durum saglanmasi icin kelimedeki butun harfler kucuk harfe cevrilir
 	        for(j = 0; j <strlen(words[count]); j++) {
 	        	words[count][j] = tolower(words[count][j]);
 			}
-			count++;	//cümlenin kelimelerini tutan count'u güncelle
-			//cümlenin kelimelerini tutan matriste yer genişlet
+			count++;	//cÃ¼mlenin kelimelerini tutan count'u gÃ¼ncelle
+			//cÃ¼mlenin kelimelerini tutan matriste yer geniÅŸlet
 			words = (char**) realloc(words, (count + 1)*sizeof(char*));
 			words[count] = (char*) calloc(WORD_SIZE, sizeof(char));
 			token = strtok(NULL, AYRAC); //cumledeki kelimeler alinir
 		}
-		//for dongusu cumledeki kelime sayısı kadar doner ve her bir kelime icin kontrol gerceklesir 
+		//for dongusu cumledeki kelime sayÄ±sÄ± kadar doner ve her bir kelime icin kontrol gerceklesir 
 		for(i = 0; i < count; i++) {
 			oneri_count = 0;
-			isExist = searchHash(sozluk,words[i]); //ilk kelime sözlükte aranir
-			//bulunamaması durumunda
+			isExist = searchHash(sozluk,words[i]); //ilk kelime sÃ¶zlÃ¼kte aranir
+			//bulunamamasÄ± durumunda
 			if(isExist == 0) {
-				//ilk kelime hatalı kelime sözlüğünde aranır
+				//ilk kelime hatalÄ± kelime sÃ¶zlÃ¼ÄŸÃ¼nde aranÄ±r
 				isExist_2 = searchHash_2(hatali_sozluk, words[i]);
-				//bulunamaması durumunda
+				//bulunamamasÄ± durumunda
 				if(isExist_2 == 1000) {
-					distances = totalDistances(words[i],sozluk); //Edit Distance'ları hesapla 
-					//ED'si 1 olan kelimeler var mı ara, varsa oneriler matrisine ekle
+					distances = totalDistances(words[i],sozluk); //Edit Distance'larÄ± hesapla 
+					//ED'si 1 olan kelimeler var mÄ± ara, varsa oneriler matrisine ekle
 					for(j = 0; j < M; j++) {
 						if(distances[j] == 1) {
-							strcpy(oneriler[oneri_count], sozluk[j].word);	//ED'si 1 olan kelimeyi öneri matrisine ekle
-							oneri_count++;	//öneri count'unu güncelle
-							//öneri matrisinin yerini 1 genişlet (sonraki ekleme durumu için)
+							strcpy(oneriler[oneri_count], sozluk[j].word);	//ED'si 1 olan kelimeyi Ã¶neri matrisine ekle
+							oneri_count++;	//Ã¶neri count'unu gÃ¼ncelle
+							//Ã¶neri matrisinin yerini 1 geniÅŸlet (sonraki ekleme durumu iÃ§in)
 							oneriler = (char**) realloc(oneriler, (oneri_count + 1)*sizeof(char*));
 							oneriler[oneri_count] = (char*) calloc(WORD_SIZE, sizeof(char));
 						}
@@ -218,49 +218,49 @@ void levenshtein(struct node *sozluk, struct node_2 *hatali_sozluk, int *hatali_
 					if(oneri_count == 0) {
 						for(j = 0; j < M; j++) {
 							if(distances[j] == 2) {
-								strcpy(oneriler[oneri_count], sozluk[j].word); //ED'si 2 olan kelimeyi öneri matrisine ekle
-								oneri_count++; //öneri count'unu güncelle
-								//öneri matrisinin yerini 1 genişlet (sonraki ekleme durumu için)
+								strcpy(oneriler[oneri_count], sozluk[j].word); //ED'si 2 olan kelimeyi Ã¶neri matrisine ekle
+								oneri_count++; //Ã¶neri count'unu gÃ¼ncelle
+								//Ã¶neri matrisinin yerini 1 geniÅŸlet (sonraki ekleme durumu iÃ§in)
 								oneriler = (char**) realloc(oneriler, (oneri_count + 1)*sizeof(char*));
 								oneriler[oneri_count] = (char*) calloc(WORD_SIZE, sizeof(char));
 							}
 						}
 					}
-					//öneri matrisinde kelime varsa
+					//Ã¶neri matrisinde kelime varsa
 					if(oneri_count != 0) {
-						//kullanıcıya hatalı kelimeyi ve önerilebilecek kelimeleri ekrana yazdırarak göster ve seçmesini iste
+						//kullanÄ±cÄ±ya hatalÄ± kelimeyi ve Ã¶nerilebilecek kelimeleri ekrana yazdÄ±rarak gÃ¶ster ve seÃ§mesini iste
 						printf("\"%s\" is not in the dictionary. Did you mean: \"%s\"",words[i],oneriler[0]);
 						for(j = 1; j < oneri_count; j++) {
 							printf(" or \"%s\"",oneriler[j]);
 						}
 						printf("\n");
-						scanf("%s",kullanici_onerisi);	//kullanıcının seçimini al
+						scanf("%s",kullanici_onerisi);	//kullanÄ±cÄ±nÄ±n seÃ§imini al
 						printf("");
-						insertTable_2(words[i],kullanici_onerisi,hatali_count,hatali_sozluk);	//hatalı kelimeyi ve kullanıcın seçtiği öneriyi hatalı kelime sözlüğüne ekle
-						strcpy(words[i],kullanici_onerisi);	//ekrana yazdırılacak olan son cümlede hatalı kelimeyi önerisi ile değiştir
+						insertTable_2(words[i],kullanici_onerisi,hatali_count,hatali_sozluk);	//hatalÄ± kelimeyi ve kullanÄ±cÄ±n seÃ§tiÄŸi Ã¶neriyi hatalÄ± kelime sÃ¶zlÃ¼ÄŸÃ¼ne ekle
+						strcpy(words[i],kullanici_onerisi);	//ekrana yazdÄ±rÄ±lacak olan son cÃ¼mlede hatalÄ± kelimeyi Ã¶nerisi ile deÄŸiÅŸtir
 					}
-					//önerilecek kelime bulunamadıysa hatalı kelimeyi oldugu gibi bırak	
+					//Ã¶nerilecek kelime bulunamadÄ±ysa hatalÄ± kelimeyi oldugu gibi bÄ±rak	
 				}
-				//hatalı kelime daha önceden hatalı kelime sözlüğüne eklendiyse, ilk eklenme anında kullanıcının seçtiği öneri yeniden önerilir
+				//hatalÄ± kelime daha Ã¶nceden hatalÄ± kelime sÃ¶zlÃ¼ÄŸÃ¼ne eklendiyse, ilk eklenme anÄ±nda kullanÄ±cÄ±nÄ±n seÃ§tiÄŸi Ã¶neri yeniden Ã¶nerilir
 				else {
 					printf("\"%s\" is not in the dictionary. Did you mean: \"%s\"",words[i],hatali_sozluk[isExist_2].onerilen_kelime);
 					printf("\n");
-					scanf("%s",kullanici_onerisi);	//kullanıcının seçimini al
+					scanf("%s",kullanici_onerisi);	//kullanÄ±cÄ±nÄ±n seÃ§imini al
 					strcpy(words[i],kullanici_onerisi);
 					//strcpy(words[i],hatali_sozluk[isExist_2].onerilen_kelime); //daha onceden onerilen kelime ile hatali kelimeyi degistir.
 				}
 			}
-			//kelime hatalı değilse ve sözlükte bulunuyorsa	bir şey yapma
+			//kelime hatalÄ± deÄŸilse ve sÃ¶zlÃ¼kte bulunuyorsa	bir ÅŸey yapma
 		}
 		printf("Final sentence :\n");
-		//cumlenin son haline for dongusu yardımıyla kelime kelime ekrana yazdır
+		//cumlenin son haline for dongusu yardÄ±mÄ±yla kelime kelime ekrana yazdÄ±r
 		words[0][0] = toupper(words[0][0]);	//cumledeki ilk harf buyuk harfe cevirilir
 		for(j = 0; j < count; j++) {
 			printf("%s ",words[j]);
 		}
 		printf("\n\nYeni cumle girisi icin 1'e, cikmak icin 0'a basiniz.\n");
-		scanf("%d",&cont);	//kullanıcıdan yeni cumle girisi olup olmayacagının bilgisi alınır
-		clear_input_buffer();	//gets() fonksiyonundan once input bufferı temizle
+		scanf("%d",&cont);	//kullanÄ±cÄ±dan yeni cumle girisi olup olmayacagÄ±nÄ±n bilgisi alÄ±nÄ±r
+		clear_input_buffer();	//gets() fonksiyonundan once input bufferÄ± temizle
 	}
 	//dinamik olarak acilan yerler free edilir
 	free(sentence);
@@ -278,7 +278,7 @@ void levenshtein(struct node *sozluk, struct node_2 *hatali_sozluk, int *hatali_
 	return ;	//fonksiyonun sonu
 }
 
-//ilgili kelimeyi alip sozluk icin tanımlanan hash tablosuna ekleyen fonksiyon
+//ilgili kelimeyi alip sozluk icin tanÄ±mlanan hash tablosuna ekleyen fonksiyon
 int insertTable(char *word, int *total_word_count, struct node *hash_table) {
 	int i = 0; //adres hesabinda adim sayisi
 	long long key = getHorner(word);	//kelimenin horner sayisi
@@ -336,7 +336,7 @@ int insertTable(char *word, int *total_word_count, struct node *hash_table) {
 		return 1;	//fonksiyondan cikilir
 	}
 	else {
-		//ilk aramada hash tablosunun gözü doluysa kelime kontrolü yapılarak ve gerekirse yeni adres hesaplanarak ilerlenir
+		//ilk aramada hash tablosunun gÃ¶zÃ¼ doluysa kelime kontrolÃ¼ yapÄ±larak ve gerekirse yeni adres hesaplanarak ilerlenir
 		while(hash_table[adr].count != 0 && strcmp(hash_table[adr].word, word) != 0) {
 			adr = (h1_key + (i * h2_key)) % M;
 			i++;
@@ -424,7 +424,7 @@ int insertTable_2(char *word, char *oneri, int *total_word_count, struct node_2 
 		return 1;	//fonksiyondan cikilir
 	}
 	else {
-		//ilk aramada hash tablosunun gözü doluysa kelime kontrolü yapılarak ve gerekirse yeni adres hesaplanarak ilerlenir
+		//ilk aramada hash tablosunun gÃ¶zÃ¼ doluysa kelime kontrolÃ¼ yapÄ±larak ve gerekirse yeni adres hesaplanarak ilerlenir
 		while(hash_table[adr].count != 0 && strcmp(hash_table[adr].word, word) != 0) {
 			adr = (h1_key + (i * h2_key)) % M;
 			i++;
@@ -455,9 +455,9 @@ int insertTable_2(char *word, char *oneri, int *total_word_count, struct node_2 
 	}
 }
 
-//dosyadan veriyi satir satir okuyup, kelimeleri sozluk icin tanımlanan hash tablosuna ekleyen fonksiyon
+//dosyadan veriyi satir satir okuyup, kelimeleri sozluk icin tanÄ±mlanan hash tablosuna ekleyen fonksiyon
 int readInputFile(char *file_name, int *total_word_count, struct node *hash_table) {
-	FILE *inputFile; //input file 'ı açmaya yarayan file pointer
+	FILE *inputFile; //input file 'Ä± aÃ§maya yarayan file pointer
 	char ch; //dosyadan karakterler okunup bu degiskene aktarilir(satir sayisini hesaplamak icin)
 	char *buffer = (char*) calloc(BUFFER_SIZE,sizeof(char)); //dosyadan alinan satirin tutuldugu buffer
 	char *word  = (char*) calloc (WORD_SIZE,sizeof(char));//satirdan parcalanip alinan kelime
@@ -465,7 +465,7 @@ int readInputFile(char *file_name, int *total_word_count, struct node *hash_tabl
 	int line_count = 0; //dosyadaki satir sayisini tutan degisken
 	int i, j; //dongu degiskeni
 	int isExist; //kelime hash table'da var mi yok mu donus degerini tutan degisken
-	char *token;	//dosyadan okunan kelimeler strtok() yardımıyla parcalanıp gecici olarak bu degiskende tutulur
+	char *token;	//dosyadan okunan kelimeler strtok() yardÄ±mÄ±yla parcalanÄ±p gecici olarak bu degiskende tutulur
 	//int wordCount = total_word_count;
 	
 	if((inputFile = fopen(file_name,"r")) == NULL) {
@@ -473,11 +473,11 @@ int readInputFile(char *file_name, int *total_word_count, struct node *hash_tabl
 		return 1;
 	}
 	else {
-		//dosyadaki satir sayisini hesaplayan do-while bloğu
+		//dosyadaki satir sayisini hesaplayan do-while bloÄŸu
 		do
         {
         	ch = fgetc(inputFile); //karakter oku
-        	//new line ise line_count'u 1 arttır
+        	//new line ise line_count'u 1 arttÄ±r
        	 	if (ch == '\n') {
        	 		line_count++;
 			} 
@@ -487,14 +487,14 @@ int readInputFile(char *file_name, int *total_word_count, struct node *hash_tabl
         
         //dosyadan veriler satir satir okunur ve isleme alinir
         for(i = 0; i < line_count; i++) {
-        	fgets(buffer,BUFFER_SIZE * sizeof(char),inputFile); //satırı dosyadan buffer'a al
+        	fgets(buffer,BUFFER_SIZE * sizeof(char),inputFile); //satÄ±rÄ± dosyadan buffer'a al
         	buffer[strlen(buffer)] = '\0'; //bufferin sinirini belirle
         	//printf("---------------------------------------------------\n");
         	//printf("Okunan satir : %s\n\n",buffer);
         	//system("PAUSE");
         	printf("\n");
         	
-        	token = strtok(buffer, AYRAC);	//dosyadaki ilk kelime alınır
+        	token = strtok(buffer, AYRAC);	//dosyadaki ilk kelime alÄ±nÄ±r
 
  			while( token != NULL ) {
  				strcpy(word, token);
@@ -511,7 +511,7 @@ int readInputFile(char *file_name, int *total_word_count, struct node *hash_tabl
 //				printf("word : %s, size %d\n",word,strlen(word));
 //        		system("PAUSE");
 				isExist = insertTable(word,total_word_count,hash_table); //kelime hash tablosuna eklenmek uzere insertTable fonksiyonu cagirilir
-				//insert table donus degerleri kontrol edilip bilgilendirme printleri atılır.
+				//insert table donus degerleri kontrol edilip bilgilendirme printleri atÄ±lÄ±r.
 //				if(isExist == -1) {
 //					printf("%s kelimesi zaten tabloda mevcut!\n\n",org_word); //kelime hash tablosunda mevcutsa blgilendirme printi atilir
 //				}
@@ -531,7 +531,7 @@ int readInputFile(char *file_name, int *total_word_count, struct node *hash_tabl
 	return 0; //fonksiyondan cikilir
 }
 
-//icine verilen kelimeyi sozluk icin tanimlanan hash tablosunda arayan fonksiyon / kelime tabloda mevcutsa 1 / değil ise 0 döner
+//icine verilen kelimeyi sozluk icin tanimlanan hash tablosunda arayan fonksiyon / kelime tabloda mevcutsa 1 / deÄŸil ise 0 dÃ¶ner
 int searchHash(struct node *hash_table, char *word) {
 	int i = 0; //kelimenin tablodaki adresi double probinge gore hesaplanirken adim sayisini tutan degisken
 	long long key; //kelimenin horner methoduna gore key degeri
@@ -550,7 +550,7 @@ int searchHash(struct node *hash_table, char *word) {
 	int h2_key = 1 + (key % MM);
 	adr = (h1_key + (i * h2_key)) % M;
 	i++;  //adim sayisi guncellenir
-	//kelime tabloda mevcut degilse ilgili gozde bulunan struct'ın text_count degeri 0 demektir.
+	//kelime tabloda mevcut degilse ilgili gozde bulunan struct'Ä±n text_count degeri 0 demektir.
 	if(hash_table[adr].count == 0) {
 		//printf("Kelime tabloda mevcut degil!\nArama islemi %d adimda tamamlanmistir.\n\n",i);
 		return 0;
@@ -559,7 +559,7 @@ int searchHash(struct node *hash_table, char *word) {
 	else {
 		//kelime ile karsilasana kadar veya bos goz gorene kadar donen while
 		while(hash_table[adr].count != 0 && strcmp(hash_table[adr].word, word) != 0) {
-			adr = (h1_key + (i * h2_key)) % M;	//adres degeri her adımda guncellenir
+			adr = (h1_key + (i * h2_key)) % M;	//adres degeri her adÄ±mda guncellenir
 			i++;	//adim sayisi guncellenir
 		}
 		//kelime ile karsilasildigi  icin while'dan cikilmissa kelime tabloda mevcuttur
@@ -576,7 +576,7 @@ int searchHash(struct node *hash_table, char *word) {
 	}
 }
 
-//icine verilen kelimeyi hatali kelime sozlugu icin tanimlanan hash tablosunda arayan fonksiyon / kelime tabloda mevcutsa kelimenin adresi, değil ise 1000 döner
+//icine verilen kelimeyi hatali kelime sozlugu icin tanimlanan hash tablosunda arayan fonksiyon / kelime tabloda mevcutsa kelimenin adresi, deÄŸil ise 1000 dÃ¶ner
 int searchHash_2(struct node_2 *hash_table, char *word) {
 	int i = 0; //kelimenin tablodaki adresi double probinge gore hesaplanirken adim sayisini tutan degisken
 	long long key; //kelimenin horner methoduna gore key degeri
@@ -595,7 +595,7 @@ int searchHash_2(struct node_2 *hash_table, char *word) {
 	int h2_key = 1 + (key % MM);
 	adr = (h1_key + (i * h2_key)) % M;
 	i++;  //adim sayisi guncellenir
-	//kelime tabloda mevcut degilse ilgili gozde bulunan struct'ın text_count degeri 0 demektir.
+	//kelime tabloda mevcut degilse ilgili gozde bulunan struct'Ä±n text_count degeri 0 demektir.
 	if(hash_table[adr].count == 0) {
 		//printf("Kelime tabloda mevcut degil!\nArama islemi %d adimda tamamlanmistir.\n\n",i);
 		return 1000;	//adres olamayacak bir deger dondurulur
@@ -604,7 +604,7 @@ int searchHash_2(struct node_2 *hash_table, char *word) {
 	else {
 		//kelime ile karsilasana kadar veya bos goz gorene kadar donen while
 		while(hash_table[adr].count != 0 && strcmp(hash_table[adr].word, word) != 0) {
-			adr = (h1_key + (i * h2_key)) % M;	//adres degeri her adımda guncellenir
+			adr = (h1_key + (i * h2_key)) % M;	//adres degeri her adÄ±mda guncellenir
 			i++;	//adim sayisi guncellenir
 		}
 		//kelime ile karsilasildigi  icin while'dan cikilmissa kelime tabloda mevcuttur
@@ -624,13 +624,13 @@ int searchHash_2(struct node_2 *hash_table, char *word) {
 
 int main() {
 	
-	//FILE *table_file, *table_file_2;	//hashtable'ların okunacağı fileler icin file pointerlar
+	//FILE *table_file, *table_file_2;	//hashtable'larÄ±n okunacaÄŸÄ± fileler icin file pointerlar
 	char *file_name = (char*) calloc(TEXT_NAME_SIZE,sizeof(char));	//input dosyasinin adi
 	struct node sozluk[M]; //sozluk icin hash tablosu
 	struct node_2 hatali_kelimeler[M]; //hatali kelime sozlugu icin hash tablosu
 	int total_word_count_1 = 0;	//tablodaki kelime sayisini tutan degisken
 	int total_word_count_2 = 0;
-	int kontrol;	//input file'in okunup okunamadiğinin kontrolunu tutan degisken
+	int kontrol;	//input file'in okunup okunamadiÄŸinin kontrolunu tutan degisken
 	int i;
 	
 	//tablolar 0'dan olusturuldugunda ilklendirme foru
@@ -712,7 +712,7 @@ int main() {
 	
 	clear_input_buffer(); //scanf'den sonra input buffer temizlenir
 	printf("\n");
-	levenshtein(sozluk,hatali_kelimeler,&total_word_count_2);	//levenshtein fonksiyonu çağırılarak cümleler alınmaya ve işlenmeye başlanır
+	levenshtein(sozluk,hatali_kelimeler,&total_word_count_2);	//levenshtein fonksiyonu Ã§aÄŸÄ±rÄ±larak cÃ¼mleler alÄ±nmaya ve iÅŸlenmeye baÅŸlanÄ±r
 	
 	free(file_name); //free islemi
 	return 0;	//end of main
